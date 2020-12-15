@@ -1,0 +1,14 @@
+• Create 3 SQS queues called Work, Unsolved & Solving
+• Create a security group called EC2-SG with an inbound rule for SSH & an outbound rule for all
+• Create a security group called EFS-SG with an inbound rule for NFS with EC2-SG as a source & an outbound rule for all
+• Create an EFS file system which is unencrypted & attatch the EFS-SG security group to each mount target in every sub-region
+• Add a credentials file with your AWS credentials & a queue file to with URLs of the 3 queues mentioned above in order to your local .aws folder
+• Modify the launch_controller & launch_worker file with the your AWS credentials, the 3 queue URLs and the file system ID of the EFS systsm
+• Create a Cloudwatch alarm called Worker Alarm with a period of 1 minute which observes the number of messages in 
+	the Unsolved SQS queue and triggers an alarm when > 0
+• Create a launch template called Worker Template with AWS AMI, m5.large intance, launch_worker user data, 8GB storage, EC2-SG security group
+• Create an EC2 autoscaling group called Workers with the Worker Template, 1, 1 & 3 for desired, minimum & maximum instances respectively, 
+	attatch a scale-out step policy triggered by Worker Alarm which adds an instance for each step 5 <= alarm < 10, 10 <= alarm < infinity,
+	attatch a scale-in step policy triggered by Worker Alarm which removes an instance for each step 1 <= alarm < 2, 2 <= alarm < infinity
+• Create an EC2 instnce called Controller with AWS AMI, m5.2xlarge instance, launch_worker user data, 32GB storage, EC2-SG security group
+• Submit work from your local machine using the client program
